@@ -1,0 +1,32 @@
+{
+  "name": "google-hosted-library",
+  "version": "0.1.0",
+  "description": "Download google hosted libraries.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Alex1990/google-hosted-library.git"
+  },
+  "keywords": [
+    "google",
+    "hosted",
+    "libraries"
+  ],
+  "author": "Alex Chao",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Alex1990/google-hosted-library/issues"
+  },
+  "homepage": "https://github.com/Alex1990/google-hosted-library",
+  "dependencies": {
+    "crawler": "^0.4.1",
+    "fs-extra": "^0.13.0",
+    "semver": "^4.1.0"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5"
+  }
+}
