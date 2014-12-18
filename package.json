@@ -23,10 +23,13 @@
   "homepage": "https://github.com/Alex1990/google-hosted-library",
   "dependencies": {
     "crawler": "^0.4.1",
+    "extend": "^2.0.0",
     "fs-extra": "^0.13.0",
+    "js-yaml": "^3.2.3",
     "semver": "^4.1.0"
   },
   "devDependencies": {
-    "grunt": "^0.4.5"
+    "grunt": "^0.4.5",
+    "grunt-contrib-jshint": "^0.10.0"
   }
 }

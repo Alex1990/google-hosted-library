@@ -1,0 +1,17 @@
+# Output dir. 
+# Default: '.'
+outputDir: '.'
+
+# The max connections.
+# Default: 10
+maxConnections: 20
+
+# Filter the libraries by the name and version of the libraries.
+# The version string is a semantic version string.
+# Default: (Load all libraries and all versions).
+libFilter:
+  jquery: '>=1.6.4'
+
+# configure the log info.
+# Default: (Do not print the request path, request number, file path and file number info).
+logInfo: true
