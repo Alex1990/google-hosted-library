@@ -10,8 +10,8 @@ var defaults = {
   outputDir: '.',
   maxConnections: 10,
   libFilter: null,
-  logConfig: true 
-}
+  logInfo: false
+};
 
 // This page is the guide of the libraries.
 var startUrl = 'https://developers.google.com/speed/libraries/devguide';
@@ -25,7 +25,7 @@ var fileCount = 0;
 
 // All libraries path template.
 var libPaths = {
-  'angularjs': 'angularjs/{{version}}/MANIFEST', 
+  'angularjs': 'angularjs/{{version}}/MANIFEST',
   'angularmaterial': 'angular_material/{{version}}/MANIFEST',
   'dojo': 'dojo/{{version}}/dojo/dojo.js',
   'ext-core': 'ext-core/{{version}}/MANIFEST',
@@ -45,95 +45,94 @@ var libPaths = {
 module.exports = function(opts) {
 
   var configFile = './_config.yml';
-  
+
   var config = yaml.safeLoad(fs.readFileSync(configFile, 'utf8'));
-  
+
   opts = extend(true, {}, defaults, config, opts);
-  
-  var outputDir = opts.outputDir;
-  var libFilter = opts.libFilter;
-  var logConfig = opts.logConfig;
 
   // The crawler to download the libraries.
   var c = new Crawler({
     maxConnections: opts.maxConnections,
     callback: function(err, result, $) {
       if (err) throw err;
-      
+
       var request = result.request;
-  
+
       var libs = {};
       var libUrls = [];
       var contentType = result.headers['content-type'];
-  
+
       if (opts.logInfo) {
-         console.log(requestCount);
-         console.log(request.path);
+         requestCount++;
+         console.log('Request Count: ' + requestCount);
+         console.log('Request Path: ' + request.path);
       }
 
       // Parse the guide page and generate the request urls.
       if (contentType.indexOf('text/html') > -1) {
         var $libDivs = $('#gc-content div[itemprop="articleBody"] > div');
-        
+
         $libDivs.each(function(index, libDiv) {
           var $libDiv = $(libDiv);
           var libname = $libDiv.attr('id');
           var versions = $libDiv.find('span.versions').eq(0).html()
                                 .replace(/\s+/g, '').split(',');
-  
+
           libs[libname] = versions;
         });
-  
+
         for (var lib in libs) {
           if (libs.hasOwnProperty(lib)) {
-            libUrls = libUrls.concat(createLibUrls(lib, libs[lib], libUrlPrefix));
+            libUrls = libUrls.concat(createLibUrls(lib, libs[lib], libUrlPrefix, opts.libFilter));
           }
         }
-  
-        libUrls = removeExists(libUrls);
-        requestCount += libUrls.length;
-  
+
+        libUrls = removeExists(libUrls, opts.outputDir);
+
         c.queue(libUrls);
-  
+
       // Request all files in the minifest.
       } else if (path.basename(request.path) === 'MANIFEST') {
-  
+
         var manifestPaths = result.body.trim().split('\n').map(function(item) {
           return item.slice(0, item.indexOf(' ') > -1 ? item.indexOf(' ') : item.length);
         });
-  
+
         var fileUrls = manifestPaths.map(function(path) {
           return request.href.slice(0, request.href.lastIndexOf('/') + 1) + path;
         });
-  
-        fileUrls = removeExists(fileUrls);
+
+        fileUrls = removeExists(fileUrls, opts.outputDir);
         requestCount += fileUrls.length;
-  
+
         c.queue(fileUrls);
-  
-      // Save the files. The below check can exclude some advertisement URLs from the sick ISP. 
+
+      // Save the files. The below check can exclude some advertisement URLs from the sick ISP.
       } else if (/^\/ajax\/libs\//.test(request.path)) {
-  
-        var filePath = path.join(outputDir, request.path);
-  
+
+        var filePath = path.join(opts.outputDir, request.path);
+
         fs.ensureDir(path.dirname(filePath), function(err) {
           if (err) throw err;
-  
+
           fs.writeFile(filePath, result.body, function(err) {
             if (err) throw err;
-            
+
             fileCount++;
-            
-           if (opts.logInfo)  console.log(fileCount + ' - ' + filePath + ' is saved!');
+
+            if (opts.logInfo) {
+              console.log('File Count: ' + fileCount);
+              console.log('File Path: ' + filePath);
+            }
           });
         });
       }
     }
   });
-  
+
   // Start the crawler.
   c.queue(startUrl);
-}
+};
 
 // Generate the request URL according to the name and version of the library.
 function createLibUrls(name, versions, urlPrefix, libFilter) {
@@ -157,7 +156,7 @@ function createLibUrls(name, versions, urlPrefix, libFilter) {
 }
 
 // Remove the request if the file exists.
-function removeExists(libUrls) {
+function removeExists(libUrls, outputDir) {
   return libUrls.filter(function(libUrl) {
     var filePath = path.join(outputDir, libUrl.replace(/.*\/\/.*?\//, ''));
     if (fs.existsSync(filePath)) {
