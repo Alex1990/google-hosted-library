@@ -122,7 +122,7 @@ module.exports = function(opts) {
 
             if (opts.logInfo) {
               console.log('File Count: ' + fileCount);
-              console.log('File Path: ' + filePath);
+              console.log('File Path: ' + filePath + '\n');
             }
           });
         });

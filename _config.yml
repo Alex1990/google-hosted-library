@@ -7,10 +7,11 @@ outputDir: '.'
 maxConnections: 20
 
 # Filter the libraries by the name and version of the libraries.
-# The version string is a semantic version string.
+# The version string is a semantic version string. More info see:
+# https://github.com/npm/node-semver
 # Default: (Load all libraries and all versions).
 libFilter:
-  jquery: '>=1.6.4'
+  jquery: '>=1.7.2 <2.0.0'
 
 # configure the log info.
 # Default: (Do not print the request path, request number, file path and file number info).
