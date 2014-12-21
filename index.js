@@ -44,9 +44,12 @@ var libPaths = {
 // Export the method.
 module.exports = function(opts) {
 
+  var config = {};
   var configFile = './_config.yml';
 
-  var config = yaml.safeLoad(fs.readFileSync(configFile, 'utf8'));
+  if (fs.existsSync(configFile)) {
+    config = yaml.safeLoad(fs.readFileSync(configFile, 'utf8'));
+  }
 
   opts = extend(true, {}, defaults, config, opts);
 
